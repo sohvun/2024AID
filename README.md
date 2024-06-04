@@ -1,12 +1,8 @@
-# 🚗 Gotcha
-
-### 딥러닝 기반 블랙박스 영상 속 불법주정차 실시간 탐지 및 자동 신고 클라우드 서비스
+# 🚗 Gotcha : 딥러닝 기반 블랙박스 영상 속 불법주정차 실시간 탐지 및 자동 신고 클라우드 서비스
 
 ![Logo](./Logo.png)
 
-
-
-### Skills
+## Skills
 
 <div align="center"> 
   <img src="https://img.shields.io/badge/python-3776AB?style=for-the-badge&logo=python&logoColor=white"> 
@@ -20,7 +16,7 @@
   <img src="https://img.shields.io/badge/amazoncloudwatch-FF4F8B?style=for-the-badge&logo=amazoncloudwatch&logoColor=white"> 
 </div>
 
-### Main Process
+## Main Process
 
 1차: 배경 인식
 - 불법주정차 금지구역임을 인지하고 어떤 유형에 해당하는지 판단
@@ -38,7 +34,7 @@
   (3) 신고 대상 필터링 후 로깅
   
 
-### Developers
+## Developers
 
 <div align="center">
   <table>
