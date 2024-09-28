@@ -1,0 +1,66 @@
+import json
+import boto3
+import psycopg2
+
+# RDS 연결 정보
+DB_HOST = 'your_rds_endpoint'
+DB_PORT = 'your_db_port'
+DB_NAME = 'your_db_name'
+DB_USER = 'your_db_user'
+DB_PASSWORD = 'your_db_password'
+
+def lambda_handler(event, context):
+    # SSM에서 메타데이터 받기
+    ssm = boto3.client('ssm')
+    metadata = get_metadata(ssm)
+
+    # 메타데이터에서 정보 추출
+    host_computer = metadata['hostComputer']
+    date = metadata['date']
+    time = metadata['time']
+    gps_latitude = metadata['gpslatitude']
+    gps_longitude = metadata['gpslongitude']
+    
+    # S3에서 이미지 URL 가져오기
+    image_url = f"s3://{bucket_name}/{object_key}"  
+
+    # 이미지 분석 및 번호판 추출
+    plate_string = detect_license_plate(image_url)  # 번호판 인식 함수
+
+    # 번호판 문자열이 정상적으로 반환된 경우
+    if plate_string:
+        # RDS에 레코드 생성
+        save_to_temporary_db(host_computer, date, time, gps_latitude, gps_longitude, image_url, plate_string)
+
+def get_metadata(ssm_client):
+    # SSM Parameter Store에서 메타데이터를 가져오는 코드
+    response = ssm_client.get_parameter(Name='your_parameter_name', WithDecryption=True)
+    return json.loads(response['Parameter']['Value'])
+
+def detect_license_plate(image_url):
+    # 이미지 분석을 통해 번호판 추출 알고리즘 실행
+    # 번호판 문자열을 반환
+    pass
+
+def save_to_temporary_db(host_computer, date, time, gps_latitude, gps_longitude, image_url, plate_string):
+    # RDS에 연결
+    conn = psycopg2.connect(
+        host=DB_HOST,
+        port=DB_PORT,
+        database=DB_NAME,
+        user=DB_USER,
+        password=DB_PASSWORD
+    )
+    cursor = conn.cursor()
+
+    # 레코드 삽입 쿼리
+    insert_query = """
+    INSERT INTO temporaryDB (device_id, capture_date, capture_time, latitude, longitude, image_url, plate_string)
+    VALUES (%s, %s, %s, %s, %s, %s, %s);
+    """
+    cursor.execute(insert_query, (host_computer, date, time, gps_latitude, gps_longitude, image_url, plate_string))
+
+    # 변경사항 커밋 및 연결 종료
+    conn.commit()
+    cursor.close()
+    conn.close()
